@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  wordpress:
+    build: .
+    container_name: wordpress-app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - wp-network
+
+  mysql:
+    image: mysql:5.7
+    container_name: wordpress-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: wppass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - wp-network
+
+  redis:
+    image: redis:latest
+    container_name: wordpress-redis
+    networks:
+      - wp-network
+
+networks:
+  wp-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
